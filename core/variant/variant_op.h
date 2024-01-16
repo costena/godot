@@ -300,6 +300,30 @@ public:
 };
 
 template <>
+class OperatorEvaluatorModNZ<double, double, double> {
+public:
+	static void evaluate(const Variant &p_left, const Variant &p_right, Variant *r_ret, bool &r_valid) {
+		const double &a = *VariantGetInternalPtr<double>::get_ptr(&p_left);
+		const double &b = *VariantGetInternalPtr<double>::get_ptr(&p_right);
+		if (unlikely(b == 0)) {
+			r_valid = false;
+			*r_ret = "Modulo by zero error";
+			return;
+		}
+		*r_ret = fmod(a, b);
+		r_valid = true;
+	}
+	static void validated_evaluate(const Variant *left, const Variant *right, Variant *r_ret) {
+		VariantTypeChanger<double>::change(r_ret);
+		*VariantGetInternalPtr<double>::get_ptr(r_ret) = fmod(*VariantGetInternalPtr<double>::get_ptr(left), *VariantGetInternalPtr<double>::get_ptr(right));
+	}
+	static void ptr_evaluate(const void *left, const void *right, void *r_ret) {
+		PtrToArg<double>::encode(PtrToArg<double>::convert(left) / PtrToArg<double>::convert(right), r_ret);
+	}
+	static Variant::Type get_return_type() { return GetTypeInfo<double>::VARIANT_TYPE; }
+};
+
+template <>
 class OperatorEvaluatorModNZ<Vector2i, Vector2i, Vector2i> {
 public:
 	static void evaluate(const Variant &p_left, const Variant &p_right, Variant *r_ret, bool &r_valid) {
